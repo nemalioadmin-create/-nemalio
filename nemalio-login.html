@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nemalio — Login & Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --dp:#1a0933;--dp2:#2d1054;--dp3:#3d1870;--dp4:#5a2d99;
+  --lp:#c9a8f5;--lp2:#e8d5ff;--lp3:#f5eeff;--lp4:#faf5ff;
+  --accent:#9b4dff;--gold:#f0c060;--green:#22c55e;--red:#ef4444;
+  --muted:#7a5a9e;--white:#fff;
+  --font-head:'Playfair Display',serif;--font-body:'Outfit',sans-serif;
+  --shadow:0 8px 32px rgba(90,45,153,.15);
+  --shadow-lg:0 24px 64px rgba(26,9,51,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,var(--dp) 0%,var(--dp3) 60%,#2a0f52 100%);min-height:100vh;font-family:var(--font-body);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative;overflow-x:hidden}
+body::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(155,77,255,.25),transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(201,168,245,.12),transparent 55%);pointer-events:none}
+
+/* BACK TO SITE */
+.back-btn{position:fixed;top:20px;left:20px;display:flex;align-items:center;gap:8px;color:rgba(201,168,245,.7);font-size:13px;font-weight:500;cursor:pointer;padding:8px 14px;border-radius:50px;border:1px solid rgba(201,168,245,.2);transition:all .2s;z-index:10;background:rgba(26,9,51,.4);backdrop-filter:blur(10px)}
+.back-btn:hover{color:var(--lp);border-color:var(--lp);background:rgba(26,9,51,.6)}
+
+/* LOGO */
+.logo{font-family:var(--font-head);font-size:28px;font-weight:900;color:var(--white);margin-bottom:28px;text-align:center;letter-spacing:-0.5px;position:relative;z-index:1}
+.logo span{color:var(--lp)}
+.logo-sub{font-size:13px;color:rgba(201,168,245,.6);font-family:var(--font-body);font-weight:300;margin-top:4px}
+
+/* CARD */
+.card{background:var(--white);border-radius:28px;width:100%;max-width:500px;overflow:hidden;box-shadow:var(--shadow-lg);position:relative;z-index:1}
+
+/* TABS */
+.tabs{display:flex;background:var(--lp4);border-bottom:1.5px solid var(--lp2)}
+.tab{flex:1;padding:16px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2.5px solid transparent;transition:all .25s;margin-bottom:-1.5px}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--white)}
+
+/* STEPS */
+.step-wrap{padding:32px}
+.step{display:none}
+.step.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* PROGRESS */
+.progress-bar{display:flex;gap:0;margin-bottom:28px}
+.progress-step{flex:1;height:4px;background:var(--lp2);border-radius:2px;margin:0 2px;transition:background .3s}
+.progress-step.done{background:var(--accent)}
+.progress-label{font-size:11px;color:var(--muted);margin-bottom:16px;font-weight:500}
+
+/* FORM */
+.step-title{font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--dp);margin-bottom:6px}
+.step-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--dp3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+.fg input,.fg select{width:100%;padding:13px 16px;border:1.5px solid var(--lp2);border-radius:12px;font-family:var(--font-body);font-size:14px;color:var(--dp);background:var(--lp4);outline:none;transition:all .2s}
+.fg input:focus,.fg select:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(155,77,255,.08)}
+.fg input.valid{border-color:var(--green);background:var(--white)}
+.fg input.error{border-color:var(--red)}
+.fg-hint{font-size:11px;color:var(--muted);margin-top:5px}
+.fg-error{font-size:11px;color:var(--red);margin-top:5px;display:none}
+.fg-error.show{display:block}
+
+/* GST TOGGLE */
+.gst-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.gst-option{padding:14px;border:2px solid var(--lp2);border-radius:14px;cursor:pointer;text-align:center;transition:all .25s;background:var(--lp4)}
+.gst-option:hover{border-color:var(--lp);background:var(--lp3)}
+.gst-option.selected{border-color:var(--accent);background:rgba(155,77,255,.06)}
+.gst-option-icon{font-size:24px;margin-bottom:6px}
+.gst-option-title{font-size:13px;font-weight:700;color:var(--dp);margin-bottom:3px}
+.gst-option-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.gst-section{display:none;background:rgba(155,77,255,.04);border:1.5px solid rgba(155,77,255,.15);border-radius:14px;padding:16px;margin-bottom:16px}
+.gst-section.show{display:block;animation:fadeUp .25s ease}
+
+/* OTP */
+.otp-display{font-size:13px;color:var(--muted);margin-bottom:12px;padding:10px 14px;background:var(--lp4);border-radius:10px;border:1px solid var(--lp2);display:flex;align-items:center;gap:8px}
+.otp-display-val{font-weight:600;color:var(--dp3);font-size:14px}
+.otp-boxes{display:flex;gap:10px;margin-bottom:8px;justify-content:center}
+.otp-box{width:52px;height:58px;border:2px solid var(--lp2);border-radius:12px;text-align:center;font-size:22px;font-weight:700;color:var(--dp);font-family:var(--font-head);background:var(--lp4);outline:none;transition:all .2s}
+.otp-box:focus{border-color:var(--accent);background:var(--white);box-shadow:0 0 0 3px rgba(155,77,255,.1)}
+.otp-box.filled{border-color:var(--accent);background:rgba(155,77,255,.05)}
+.otp-timer{font-size:12px;color:var(--muted);text-align:center;margin-bottom:16px}
+.otp-timer span{color:var(--accent);font-weight:600}
+.resend-btn{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);text-decoration:underline}
+.resend-btn:disabled{color:var(--muted);text-decoration:none;cursor:not-allowed}
+.sent-badge{display:inline-flex;align-items:center;gap:6px;background:#d4f5e2;color:#0a5c2a;font-size:11px;font-weight:600;padding:4px 12px;border-radius:50px;margin-bottom:12px}
+
+/* VERIFY STATUS */
+.verify-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--lp2);margin-bottom:10px;background:var(--lp4);transition:all .3s}
+.verify-item.verified{border-color:var(--green);background:#f0fdf4}
+.verify-item.active{border-color:var(--accent);background:rgba(155,77,255,.04)}
+.verify-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--lp2)}
+.verify-item.verified .verify-icon{background:#d4f5e2}
+.verify-item.active .verify-icon{background:rgba(155,77,255,.15)}
+.verify-info h4{font-size:13px;font-weight:600;color:var(--dp);margin-bottom:2px}
+.verify-info p{font-size:11px;color:var(--muted)}
+.verify-status{margin-left:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px}
+.vs-done{background:#d4f5e2;color:#0a5c2a}
+.vs-pending{background:var(--lp2);color:var(--muted)}
+.vs-active{background:rgba(155,77,255,.15);color:var(--accent)}
+
+/* BUTTONS */
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),var(--dp4));color:#fff;border:none;padding:15px;border-radius:50px;font-size:15px;font-weight:700;font-family:var(--font-head);cursor:pointer;transition:all .25s;margin-top:8px}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(155,77,255,.4)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-secondary{width:100%;background:transparent;color:var(--accent);border:1.5px solid var(--lp2);padding:13px;border-radius:50px;font-size:14px;font-weight:600;font-family:var(--font-body);cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-secondary:hover{background:var(--lp4);border-color:var(--lp)}
+.btn-send{display:flex;align-items:center;gap:6px;background:var(--lp3);color:var(--dp3);border:1.5px solid var(--lp2);padding:11px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:all .2s;white-space:nowrap}
+.btn-send:hover{background:var(--lp2);border-color:var(--lp)}
+.btn-send:disabled{opacity:.5;cursor:not-allowed}
+.input-with-btn{display:flex;gap:10px;align-items:flex-end}
+.input-with-btn .fg{flex:1;margin-bottom:0}
+
+/* SUCCESS */
+.success-wrap{text-align:center;padding:16px 0}
+.success-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--green),#16a34a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;box-shadow:0 12px 32px rgba(34,197,94,.3)}
+.success-title{font-family:var(--font-head);font-size:26px;font-weight:700;color:var(--dp);margin-bottom:8px}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px}
+.success-details{background:var(--lp4);border:1.5px solid var(--lp2);border-radius:16px;padding:16px;margin-bottom:20px;text-align:left}
+.sd-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--lp2);font-size:13px}
+.sd-row:last-child{border-bottom:none}
+.sd-label{color:var(--muted)}
+.sd-val{font-weight:600;color:var(--dp)}
+
+/* LOGIN */
+.login-step{padding:32px}
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;font-size:12px;color:var(--muted)}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--lp2)}
+.google-btn{width:100%;background:var(--white);color:var(--dp);border:1.5px solid var(--lp2);padding:13px;border-radius:50px;font-size:14px;font-weight:600;font-family:var(--font-body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.google-btn:hover{border-color:var(--accent);background:var(--lp4)}
+.forgot{font-size:12px;color:var(--accent);text-align:right;cursor:pointer;margin-top:-10px;margin-bottom:16px;font-weight:500}
+.forgot:hover{text-decoration:underline}
+.note{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="back-btn" onclick="history.back()">← Back to Nemalio</div>
+
+<div class="logo">nema<span>lio</span><div class="logo-sub">India's trusted marketplace</div></div>
+
+<div class="card">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('login',this)" id="tab-login">Sign In</div>
+    <div class="tab" onclick="switchTab('register',this)" id="tab-register">Create Account</div>
+  </div>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="login-panel" class="login-step">
+    <div class="step-title">Welcome back</div>
+    <div class="step-sub" style="margin-bottom:24px">Sign in to your Nemalio account</div>
+    <div class="fg"><label>Phone Number or Email</label><input type="text" id="login-id" placeholder="+91 98765 43210 or email@gmail.com"/></div>
+    <div class="fg"><label>Password</label><input type="password" id="login-pass" placeholder="Enter your password"/></div>
+    <div class="forgot" onclick="showForgot()">Forgot password?</div>
+    <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+    <div class="divider">or continue with</div>
+    <button class="google-btn" onclick="googleLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div class="note">By signing in you agree to Nemalio's <u>Terms of Service</u> and <u>Privacy Policy</u></div>
+  </div>
+
+  <!-- ===== REGISTER ===== -->
+  <div id="register-panel" style="display:none">
+
+    <!-- STEP 1: Personal Info -->
+    <div class="step-wrap" id="reg-step-1">
+      <div class="progress-bar">
+        <div class="progress-step done" id="ps1"></div>
+        <div class="progress-step" id="ps2"></div>
+        <div class="progress-step" id="ps3"></div>
+        <div class="progress-step" id="ps4"></div>
+      </div>
+      <div class="progress-label">Step 1 of 4 — Personal Details</div>
+      <div class="step-title">Tell us about you</div>
+      <div class="step-sub">Start with your basic details to create your Nemalio account</div>
+      <div class="form-row">
+        <div class="fg"><label>First Name *</label><input type="text" id="r-fname" placeholder="Rahul"/></div>
+        <div class="fg"><label>Last Name *</label><input type="text" id="r-lname" placeholder="Sharma"/></div>
+      </div>
+      <div class="fg"><label>Date of Birth *</label><input type="date" id="r-dob"/></div>
+      <div class="fg"><label>Gender</label>
+        <select id="r-gender">
+          <option value="">Prefer not to say</option>
+          <option>Male</option><option>Female</option><option>Other</option>
+        </select>
+      </div>
+
+      <!-- GST TOGGLE -->
+      <div class="fg">
+        <label>Account Type *</label>
+        <div class="gst-toggle">
+          <div class="gst-option" id="gst-no" onclick="selectGST('no')">
+            <div class="gst-option-icon">👤</div>
+            <div class="gst-option-title">Personal</div>
+            <div class="gst-option-desc">Individual shopper — no GST required</div>
+          </div>
+          <div class="gst-option" id="gst-yes" onclick="selectGST('yes')">
+            <div class="gst-option-icon">🏢</div>
+            <div class="gst-option-title">Business / GST</div>
+            <div class="gst-option-desc">Business buyer — enter GSTIN for tax invoice</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gst-section" id="gst-section">
+        <div class="fg" style="margin-bottom:0">
+          <label>GSTIN Number *</label>
+          <div class="input-with-btn">
+            <div class="fg"><input type="text" id="r-gst" placeholder="22AAAAA0000A1Z5" maxlength="15" oninput="this.value=this.value.toUpperCase()"/><div class="fg-hint">15-digit GST Identification Number</div></div>
+            <button class="btn-send" onclick="verifyGST()" id="gst-verify-btn">Verify</button>
+          </div>
+          <div class="fg-error" id="gst-error">Please enter a valid 15-digit GSTIN</div>
+          <div id="gst-verified" style="display:none" class="sent-badge">✅ GST Verified — <span id="gst-biz-name"></span></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+    </div>
+
+    <!-- STEP 2: Phone OTP -->
+    <div class="step-wrap" id="reg-step-2" style="display:none">
+      <div class="progress-bar">
+        <div class="progress-step done"></div>
+        <div class="progress-step done" id="ps2b"></div>
+        <div class="progress-step" id="ps3b"></div>
+        <div class="progress-step" id="ps4b"></div>
+      </div>
+      <div class="progress-label">Step 2 of 4 — Verify Phone Number</div>
+      <div class="step-title">📱 Verify your phone</div>
+      <div class="step-sub">We will send a 6-digit OTP to your mobile number for verification</div>
+
+      <div class="verify-item active" id="phone-verify-item">
+        <div class="verify-icon">📱</div>
+        <div class="verify-info"><h4>Mobile Number</h4><p id="phone-display-text">Enter your phone number below</p></div>
+        <div class="verify-status vs-active" id="phone-vs">Pending</div>
+      </div>
+
+      <div class="fg">
+        <label>Phone Number *</label>
+        <div class="input-with-btn">
+          <div class="fg"><input type="tel" id="r-phone" placeholder="+91 98765 43210" maxlength="13"/></div>
+          <button class="btn-send" id="send-phone-otp" onclick="sendOTP('phone')">📤 Send OTP</button>
+        </div>
+      </div>
+
+      <div id="phone-otp-wrap" style="display:none">
+        <div class="sent-badge">✅ OTP sent to <span id="phone-sent-to"></span></div>
+        <div class="fg"><label>Enter 6-digit OTP</label>
+          <div class="otp-boxes">
+            <input class="otp-box" maxlength="1" id="potp1" oninput="otpMove(this,'potp2')" onkeydown="otpBack(event,this,'')"/>
+            <input class="otp-box" maxlength="1" id="potp2" oninput="otpMove(this,'potp3')" onkeydown="otpBack(event,this,'potp1')"/>
+            <input class="otp-box" maxlength="1" id="potp3" oninput="otpMove(this,'potp4')" onkeydown="otpBack(event,this,'potp2')"/>
+            <input class="otp-box" maxlength="1" id="potp4" oninput="otpMove(this,'potp5')" onkeydown="otpBack(event,this,'potp3')"/>
+            <input class="otp-box" maxlength="1" id="potp5" oninput="otpMove(this,'potp6')" onkeydown="otpBack(event,this,'potp4')"/>
+            <input class="otp-box" maxlength="1" id="potp6" oninput="otpMove(this,'')" onkeydown="otpBack(event,this,'potp5')"/>
+          </div>
+        </div>
+        <div class="otp-timer">Resend OTP in <span id="phone-timer">30</span>s &nbsp;·&nbsp; <button class="resend-btn" id="phone-resend" disabled onclick="resendOTP('phone')">Resend</button></div>
+        <button class="btn-primary" onclick="verifyOTP('phone')">Verify Phone →</button>
+      </div>
+
+      <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+    </div>
+
+    <!-- STEP 3: Email OTP -->
+    <div class="step-wrap" id="reg-step-3" style="display:none">
+      <div class="progress-bar">
+        <div class="progress-step done"></div>
+        <div class="progress-step done"></div>
+        <div class="progress-step done" id="ps3c"></div>
+        <div class="progress-step" id="ps4c"></div>
+      </div>
+      <div class="progress-label">Step 3 of 4 — Verify Email Address</div>
+      <div class="step-title">📧 Verify your email</div>
+      <div class="step-sub">Enter your email address — we will send a verification code</div>
+
+      <div class="verify-item verified">
+        <div class="verify-icon">📱</div>
+        <div class="verify-info"><h4>Mobile Number</h4><p id="phone-verified-show">Verified</p></div>
+        <div class="verify-status vs-done">✓ Verified</div>
+      </div>
+      <div class="verify-item active">
+        <div class="verify-icon">📧</div>
+        <div class="verify-info"><h4>Email Address</h4><p>Enter your email below</p></div>
+        <div class="verify-status vs-active">Pending</div>
+      </div>
+
+      <div class="fg">
+        <label>Email Address *</label>
+        <div class="input-with-btn">
+          <div class="fg"><input type="email" id="r-email" placeholder="rahul@gmail.com"/></div>
+          <button class="btn-send" id="send-email-otp" onclick="sendOTP('email')">📤 Send OTP</button>
+        </div>
+      </div>
+
+      <div id="email-otp-wrap" style="display:none">
+        <div class="sent-badge">✅ OTP sent to <span id="email-sent-to"></span></div>
+        <div class="fg"><label>Enter 6-digit OTP</label>
+          <div class="otp-boxes">
+            <input class="otp-box" maxlength="1" id="eotp1" oninput="otpMove(this,'eotp2')" onkeydown="otpBack(event,this,'')"/>
+            <input class="otp-box" maxlength="1" id="eotp2" oninput="otpMove(this,'eotp3')" onkeydown="otpBack(event,this,'eotp1')"/>
+            <input class="otp-box" maxlength="1" id="eotp3" oninput="otpMove(this,'eotp4')" onkeydown="otpBack(event,this,'eotp2')"/>
+            <input class="otp-box" maxlength="1" id="eotp4" oninput="otpMove(this,'eotp5')" onkeydown="otpBack(event,this,'eotp3')"/>
+            <input class="otp-box" maxlength="1" id="eotp5" oninput="otpMove(this,'eotp6')" onkeydown="otpBack(event,this,'eotp4')"/>
+            <input class="otp-box" maxlength="1" id="eotp6" oninput="otpMove(this,'')" onkeydown="otpBack(event,this,'eotp5')"/>
+          </div>
+        </div>
+        <div class="otp-timer">Resend OTP in <span id="email-timer">30</span>s &nbsp;·&nbsp; <button class="resend-btn" id="email-resend" disabled onclick="resendOTP('email')">Resend</button></div>
+        <button class="btn-primary" onclick="verifyOTP('email')">Verify Email →</button>
+      </div>
+
+      <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+    </div>
+
+    <!-- STEP 4: Password -->
+    <div class="step-wrap" id="reg-step-4" style="display:none">
+      <div class="progress-bar">
+        <div class="progress-step done"></div>
+        <div class="progress-step done"></div>
+        <div class="progress-step done"></div>
+        <div class="progress-step done"></div>
+      </div>
+      <div class="progress-label">Step 4 of 4 — Set Password</div>
+      <div class="step-title">🔐 Create your password</div>
+      <div class="step-sub">Almost done! Set a strong password to secure your Nemalio account</div>
+
+      <div class="verify-item verified" style="margin-bottom:8px">
+        <div class="verify-icon">📱</div>
+        <div class="verify-info"><h4>Phone</h4><p id="final-phone"></p></div>
+        <div class="verify-status vs-done">✓ Verified</div>
+      </div>
+      <div class="verify-item verified" style="margin-bottom:16px">
+        <div class="verify-icon">📧</div>
+        <div class="verify-info"><h4>Email</h4><p id="final-email"></p></div>
+        <div class="verify-status vs-done">✓ Verified</div>
+      </div>
+
+      <div class="fg"><label>Create Password *</label><input type="password" id="r-pass" placeholder="Min. 8 characters" oninput="checkPass()"/><div class="fg-hint" id="pass-strength"></div></div>
+      <div class="fg"><label>Confirm Password *</label><input type="password" id="r-pass2" placeholder="Re-enter your password"/></div>
+      <div class="fg" style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+        <input type="checkbox" id="r-terms" style="width:16px;height:16px;margin-top:2px;accent-color:var(--accent)"/>
+        <label for="r-terms" style="font-size:12px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer">I agree to Nemalio's <u style="color:var(--accent)">Terms of Service</u>, <u style="color:var(--accent)">Privacy Policy</u> and <u style="color:var(--accent)">Refund Policy</u></label>
+      </div>
+      <button class="btn-primary" onclick="createAccount()">Create My Account 🚀</button>
+      <button class="btn-secondary" onclick="goStep(3)">← Back</button>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step-wrap" id="reg-success" style="display:none">
+      <div class="success-wrap">
+        <div class="success-icon">🎉</div>
+        <div class="success-title">Welcome to Nemalio!</div>
+        <div class="success-sub">Your account has been created and verified successfully. Start shopping thousands of products from verified sellers across India!</div>
+        <div class="success-details">
+          <div class="sd-row"><span class="sd-label">Name</span><span class="sd-val" id="final-name"></span></div>
+          <div class="sd-row"><span class="sd-label">Phone</span><span class="sd-val" id="final-phone2"></span></div>
+          <div class="sd-row"><span class="sd-label">Email</span><span class="sd-val" id="final-email2"></span></div>
+          <div class="sd-row"><span class="sd-label">Account Type</span><span class="sd-val" id="final-type"></span></div>
+          <div class="sd-row" id="gst-row" style="display:none"><span class="sd-label">GSTIN</span><span class="sd-val" id="final-gst"></span></div>
+          <div class="sd-row"><span class="sd-label">Status</span><span class="sd-val" style="color:var(--green)">✓ Verified & Active</span></div>
+        </div>
+        <button class="btn-primary" onclick="goToShopping()">Start Shopping →</button>
+      </div>
+    </div>
+
+  </div><!-- end register-panel -->
+</div><!-- end card -->
+
+<div style="font-size:12px;color:rgba(201,168,245,.4);margin-top:20px;text-align:center;position:relative;z-index:1">
+  🔒 256-bit SSL Encrypted &nbsp;·&nbsp; Your data is safe with Nemalio
+</div>
+
+<script>
+var gstSelected='no';
+var phoneVerified=false;
+var emailVerified=false;
+var phoneOTP='';
+var emailOTP='';
+var phoneTimerInt,emailTimerInt;
+
+// TAB SWITCH
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('login-panel').style.display=tab==='login'?'block':'none';
+  document.getElementById('register-panel').style.display=tab==='register'?'block':'none';
+}
+
+// GST SELECTION
+function selectGST(type){
+  gstSelected=type;
+  document.getElementById('gst-no').classList.toggle('selected',type==='no');
+  document.getElementById('gst-yes').classList.toggle('selected',type==='yes');
+  document.getElementById('gst-section').classList.toggle('show',type==='yes');
+}
+
+// GST VERIFY (simulated)
+function verifyGST(){
+  var gst=document.getElementById('r-gst').value.trim();
+  var err=document.getElementById('gst-error');
+  if(!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst)){
+    err.classList.add('show');return;
+  }
+  err.classList.remove('show');
+  document.getElementById('gst-verify-btn').disabled=true;
+  document.getElementById('gst-verify-btn').textContent='Verifying...';
+  setTimeout(function(){
+    var bizNames={'22AAAAA0000A1Z5':'Rahul Enterprises','29GGGGG1314R9Z6':'Tech Solutions Pvt Ltd'};
+    var name=bizNames[gst]||'Your Business Name';
+    document.getElementById('gst-biz-name').textContent=name;
+    document.getElementById('gst-verified').style.display='inline-flex';
+    document.getElementById('gst-verify-btn').textContent='✓ Verified';
+    document.getElementById('r-gst').classList.add('valid');
+    showToast('GST verified — '+name);
+  },1500);
+}
+
+// STEP NAVIGATION
+function goStep(n){
+  // validate step 1
+  if(n===2){
+    var fname=document.getElementById('r-fname').value.trim();
+    var lname=document.getElementById('r-lname').value.trim();
+    var dob=document.getElementById('r-dob').value;
+    if(!fname||!lname||!dob){showToast('Please fill First Name, Last Name and Date of Birth ⚠️');return;}
+    if(gstSelected==='yes'&&!document.getElementById('gst-verified').style.display==='inline-flex'){
+      // allow even if gst not verified for demo
+    }
+    if(!gstSelected){showToast('Please select Personal or Business account type ⚠️');return;}
+  }
+  // validate step 2
+  if(n===3&&!phoneVerified){showToast('Please verify your phone number first ⚠️');return;}
+  // validate step 3
+  if(n===4&&!emailVerified){showToast('Please verify your email address first ⚠️');return;}
+
+  [1,2,3,4].forEach(function(s){
+    var el=document.getElementById('reg-step-'+s);
+    if(el)el.style.display=s===n?'block':'none';
+  });
+  document.getElementById('reg-success').style.display='none';
+
+  // populate final step
+  if(n===4){
+    document.getElementById('final-phone').textContent=document.getElementById('r-phone').value;
+    document.getElementById('final-email').textContent=document.getElementById('r-email').value;
+  }
+}
+
+// SEND OTP
+function sendOTP(type){
+  if(type==='phone'){
+    var phone=document.getElementById('r-phone').value.trim();
+    if(phone.length<10){showToast('Please enter a valid phone number ⚠️');return;}
+    phoneOTP=Math.floor(100000+Math.random()*900000).toString();
+    document.getElementById('phone-sent-to').textContent=phone;
+    document.getElementById('phone-otp-wrap').style.display='block';
+    document.getElementById('send-phone-otp').disabled=true;
+    document.getElementById('phone-display-text').textContent=phone;
+    startTimer('phone');
+    showToast('OTP sent to '+phone+' — Demo OTP: '+phoneOTP+' 📱');
+  } else {
+    var email=document.getElementById('r-email').value.trim();
+    if(!email.includes('@')){showToast('Please enter a valid email address ⚠️');return;}
+    emailOTP=Math.floor(100000+Math.random()*900000).toString();
+    document.getElementById('email-sent-to').textContent=email;
+    document.getElementById('email-otp-wrap').style.display='block';
+    document.getElementById('send-email-otp').disabled=true;
+    startTimer('email');
+    showToast('OTP sent to '+email+' — Demo OTP: '+emailOTP+' 📧');
+  }
+}
+
+// OTP BOXES
+function otpMove(el,nextId){
+  el.classList.toggle('filled',el.value.length>0);
+  if(el.value&&nextId)document.getElementById(nextId).focus();
+}
+function otpBack(e,el,prevId){
+  if(e.key==='Backspace'&&!el.value&&prevId)document.getElementById(prevId).focus();
+}
+function getOTPValue(prefix){
+  return ['1','2','3','4','5','6'].map(function(n){
+    return document.getElementById(prefix+n).value;
+  }).join('');
+}
+
+// VERIFY OTP
+function verifyOTP(type){
+  if(type==='phone'){
+    var entered=getOTPValue('potp');
+    if(entered.length<6){showToast('Please enter all 6 digits ⚠️');return;}
+    if(entered===phoneOTP){
+      phoneVerified=true;
+      document.getElementById('phone-verify-item').className='verify-item verified';
+      document.getElementById('phone-vs').className='verify-status vs-done';
+      document.getElementById('phone-vs').textContent='✓ Verified';
+      clearInterval(phoneTimerInt);
+      showToast('Phone number verified successfully ✅');
+      setTimeout(function(){goStep(3);},800);
+    } else {
+      showToast('Wrong OTP. Please try again ❌');
+      ['potp1','potp2','potp3','potp4','potp5','potp6'].forEach(function(id){
+        document.getElementById(id).value='';
+        document.getElementById(id).classList.remove('filled');
+      });
+      document.getElementById('potp1').focus();
+    }
+  } else {
+    var entered=getOTPValue('eotp');
+    if(entered.length<6){showToast('Please enter all 6 digits ⚠️');return;}
+    if(entered===emailOTP){
+      emailVerified=true;
+      showToast('Email verified successfully ✅');
+      clearInterval(emailTimerInt);
+      setTimeout(function(){goStep(4);},800);
+    } else {
+      showToast('Wrong OTP. Please try again ❌');
+      ['eotp1','eotp2','eotp3','eotp4','eotp5','eotp6'].forEach(function(id){
+        document.getElementById(id).value='';
+        document.getElementById(id).classList.remove('filled');
+      });
+      document.getElementById('eotp1').focus();
+    }
+  }
+}
+
+// TIMER
+function startTimer(type){
+  var secs=30;
+  var timerEl=document.getElementById(type+'-timer');
+  var resendBtn=document.getElementById(type+'-resend');
+  resendBtn.disabled=true;
+  var interval=setInterval(function(){
+    secs--;
+    timerEl.textContent=secs;
+    if(secs<=0){
+      clearInterval(interval);
+      resendBtn.disabled=false;
+      timerEl.textContent='0';
+    }
+  },1000);
+  if(type==='phone')phoneTimerInt=interval;
+  else emailTimerInt=interval;
+}
+
+function resendOTP(type){
+  sendOTP(type);
+}
+
+// PASSWORD STRENGTH
+function checkPass(){
+  var p=document.getElementById('r-pass').value;
+  var el=document.getElementById('pass-strength');
+  if(p.length<6){el.textContent='Weak — too short';el.style.color='var(--red)';}
+  else if(p.length<8){el.textContent='Fair — add more characters';el.style.color='#f59e0b';}
+  else if(p.match(/[A-Z]/)&&p.match(/[0-9]/)&&p.match(/[^a-zA-Z0-9]/)){el.textContent='Strong ✓';el.style.color='var(--green)';}
+  else if(p.match(/[A-Z]/)&&p.match(/[0-9]/)){el.textContent='Good — add a symbol for stronger';el.style.color='#3b82f6';}
+  else{el.textContent='Medium — add uppercase & numbers';el.style.color='#f59e0b';}
+}
+
+// CREATE ACCOUNT
+function createAccount(){
+  var pass=document.getElementById('r-pass').value;
+  var pass2=document.getElementById('r-pass2').value;
+  var terms=document.getElementById('r-terms').checked;
+  if(pass.length<8){showToast('Password must be at least 8 characters ⚠️');return;}
+  if(pass!==pass2){showToast('Passwords do not match ⚠️');return;}
+  if(!terms){showToast('Please accept the Terms of Service to continue ⚠️');return;}
+
+  // SHOW SUCCESS
+  var fname=document.getElementById('r-fname').value;
+  var lname=document.getElementById('r-lname').value;
+  var phone=document.getElementById('r-phone').value;
+  var email=document.getElementById('r-email').value;
+  var gst=document.getElementById('r-gst').value;
+  var type=gstSelected==='yes'?'Business (GST)':'Personal';
+
+  document.getElementById('final-name').textContent=fname+' '+lname;
+  document.getElementById('final-phone2').textContent=phone;
+  document.getElementById('final-email2').textContent=email;
+  document.getElementById('final-type').textContent=type;
+  if(gstSelected==='yes'&&gst){
+    document.getElementById('gst-row').style.display='flex';
+    document.getElementById('final-gst').textContent=gst;
+  }
+  [1,2,3,4].forEach(function(s){
+    var el=document.getElementById('reg-step-'+s);
+    if(el)el.style.display='none';
+  });
+  document.getElementById('reg-success').style.display='block';
+
+  // Save to localStorage for demo
+  var userData={name:fname+' '+lname,phone:phone,email:email,type:type,gst:gst||null};
+  try{localStorage.setItem('nemalio-user',JSON.stringify(userData));}catch(e){}
+  showToast('Account created successfully! Welcome to Nemalio 🎉');
+}
+
+// LOGIN
+function doLogin(){
+  var id=document.getElementById('login-id').value.trim();
+  var pass=document.getElementById('login-pass').value;
+  if(!id||!pass){showToast('Please enter your phone/email and password ⚠️');return;}
+  showToast('Signing in... Welcome back to Nemalio! 🎉');
+  setTimeout(function(){goToShopping();},1500);
+}
+
+function googleLogin(){
+  showToast('Google Sign-in coming soon! 🔜');
+}
+
+function showForgot(){
+  showToast('Password reset link will be sent to your registered email 📧');
+}
+
+function goToShopping(){
+  showToast('Redirecting to Nemalio... 🛒');
+  setTimeout(function(){window.location.href='nemalio.html';},1000);
+}
+
+// TOAST
+function showToast(msg){
+  var existing=document.getElementById('toast-msg');
+  if(existing)existing.remove();
+  var t=document.createElement('div');
+  t.id='toast-msg';
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dp);border:1px solid var(--lp);color:var(--white);padding:13px 22px;border-radius:14px;font-size:13px;font-weight:500;box-shadow:0 12px 40px rgba(26,9,51,.3);transition:transform .3s ease;z-index:999;text-align:center;max-width:340px;font-family:var(--font-body)';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.transform='translateX(-50%) translateY(0)'},10);
+  setTimeout(function(){t.style.transform='translateX(-50%) translateY(80px)';setTimeout(function(){t.remove()},300)},3500);
+}
+
+// Auto select personal on load
+selectGST('no');
+</script>
+</body>
+</html>
